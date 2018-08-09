@@ -1,10 +1,18 @@
 var scene, camera, renderer;
 
+var car;
 function create_line(line_length, line_width=50, line_height=2){
     let geometry = new THREE.BoxGeometry(line_length, line_width, line_height)
     let material = new THREE.MeshBasicMaterial( { color: 0xffd700} );
-    let cube = new THREE.Mesh(geometry, material);
-    return cube;
+    let line = new THREE.Mesh(geometry, material);
+    return line;
+}
+
+function create_car(car_length, car_width, car_height){
+    let geometry = new THREE.BoxGeometry(car_length, car_width, car_height)
+    let material = new THREE.MeshBasicMaterial( { color: 0xff4500} );
+    let car = new THREE.Mesh(geometry, material);
+    return car;
 }
 
 function change_position(cube, x, y ,z){
@@ -103,15 +111,34 @@ function init(){
                                                         (garage_width + middle_line_right_length) * 0.5, 
                                                         0, 100);
     scene.add(middle_line_right);
-    console_log_position("middle_line_right", middle_line_right);                                                        
+    console_log_position("middle_line_right", middle_line_right); 
+    
+    car = create_car(car_length, car_width, 150);
+    change_position(car, -700, 500,100);
+    scene.add(car);
+    console_log_position("car",car);
                                              
 
     camera.position.z = 1000;
+
 }
 
 function render(){
     renderer.render(scene, camera);
 }
+
+function showkey(){
+    var key = event.keyCode;
+    //  if (key == 37) alert("left");
+    //  if (key == 38) alert("up");
+    //  if (key == 39) alert("right");
+    //  if (key == 40) alert("down");
+    if (key == 38){
+        car.position.x += 1;
+    }
+
+
+ }
 
 function animate(){
     render();
@@ -124,5 +151,7 @@ function threeStart() {
 
     var controls = new THREE.OrbitControls(camera);
     controls.addEventListener('change', render);
+
+    document.onkeydown=showkey;
     animate();
 }
