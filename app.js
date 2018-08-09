@@ -1,6 +1,7 @@
 var scene, camera, renderer;
 
-var car;
+var car, steering_wheel;
+
 function create_line(line_length, line_width=50, line_height=2){
     let geometry = new THREE.BoxGeometry(line_length, line_width, line_height)
     let material = new THREE.MeshBasicMaterial( { color: 0xffd700} );
@@ -117,6 +118,18 @@ function init(){
     change_position(car, -700, 500,100);
     scene.add(car);
     console_log_position("car",car);
+
+    var steering_wheel_geometry = new THREE.CylinderGeometry( 145, 145, 30, 20);
+    // var steering_wheel_material = new THREE.MeshBasicMaterial( { color: 0x87ceff } );
+    var steering_wheel_material = new THREE.MeshBasicMaterial(     
+                    { map: THREE.ImageUtils.loadTexture('images/steering_wheel.png') 
+                        } );
+
+    steering_wheel = new THREE.Mesh( steering_wheel_geometry, steering_wheel_material );
+    change_position(steering_wheel, 500, -220, 180);
+    steering_wheel.rotation.x = 90 * Math.PI / 180;
+    console_log_position("steering_wheel", steering_wheel);
+    scene.add( steering_wheel );
                                              
 
     camera.position.z = 1000;
@@ -133,9 +146,21 @@ function showkey(){
     //  if (key == 38) alert("up");
     //  if (key == 39) alert("right");
     //  if (key == 40) alert("down");
-    if (key == 38){
-        car.position.x += 1;
+
+    if (key == 37){
+        steering_wheel.rotation.y -= 15 * Math.PI / 180
     }
+
+    if (key == 38){
+        car.position.x += 5;
+    }
+    if (key == 39){
+        steering_wheel.rotation.y -= 15 * Math.PI / 180
+    }
+    if (key == 40){
+        car.position.x -= 5;
+    }
+
 
 
  }
