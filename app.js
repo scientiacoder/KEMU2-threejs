@@ -53,7 +53,7 @@ function init(){
     document.getElementById("canvas-frame").appendChild( renderer.domElement );
 
 
-    var car_length = 447.3, car_width = 170.6;
+    var car_length = 450.1, car_width = 170.6, car_height = 146.9 - 30.03 * 2;
     var garage_width = car_width + 60, garage_length = car_length + 70;
     var control_distance = car_length * 1.5, lane_width = car_length * 1.5;
 
@@ -114,10 +114,11 @@ function init(){
     scene.add(middle_line_right);
     console_log_position("middle_line_right", middle_line_right); 
     
-    car = create_car(car_length, car_width, 150);
-    change_position(car, -700, 500,100);
-    scene.add(car);
-    console_log_position("car",car);
+    car = create_car(car_length, car_width, car_height);
+
+    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz = 100 + 60.06 + car_height * 0.5;
+    change_position(car, car_start_postionx, car_start_postiony, car_start_postionz);
+
 
     var steering_wheel_geometry = new THREE.CylinderGeometry( 145, 145, 30, 20);
     // var steering_wheel_material = new THREE.MeshBasicMaterial( { color: 0x87ceff } );
@@ -130,7 +131,26 @@ function init(){
     steering_wheel.rotation.x = 90 * Math.PI / 180;
     console_log_position("steering_wheel", steering_wheel);
     scene.add( steering_wheel );
-                                             
+
+    var wheelbase = 260.4; // back wheel 0.214 front wheel 0.186
+    var tyre_radius = 30.03, tyre_width = 17.5, tyre_diameter = 2 * tyre_radius;
+    var tyre_geometry = new THREE.CylinderGeometry(tyre_radius, tyre_radius, tyre_width, 20);
+    var tyre_material = new THREE.MeshBasicMaterial(     
+        { map: THREE.ImageUtils.loadTexture('images/tyre.png') 
+            } );
+    var tyre_front_left = new THREE.Mesh(tyre_geometry, tyre_material);
+    var tyre_front_right = new THREE.Mesh(tyre_geometry, tyre_material);
+    var tyre_back_left = new THREE.Mesh(tyre_geometry, tyre_material);
+    var tyre_back_right = new THREE.Mesh(tyre_geometry, tyre_material);
+    car.add(tyre_front_left);
+    car.add(tyre_front_right);
+    car.add(tyre_back_left);
+    car.add(tyre_back_right);
+    // change_position(tyre_front_left, car_start_postionx + car_length * (0.5 - 0.186), car_start_postiony + car_width * 0.5 - tyre_width * 0.5, 100);
+
+
+    scene.add(car);
+    console_log_position("car",car);
 
     camera.position.z = 1000;
 
@@ -148,7 +168,7 @@ function showkey(){
     //  if (key == 40) alert("down");
 
     if (key == 37){
-        steering_wheel.rotation.y -= 15 * Math.PI / 180
+        steering_wheel.rotation.y += 15 * Math.PI / 180
     }
 
     if (key == 38){
