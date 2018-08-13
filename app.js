@@ -116,7 +116,7 @@ function init(){
     
     car = create_car(car_length, car_width, car_height);
 
-    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz = 100 + 60.06 + car_height * 0.5;
+    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz = 100 + 30.03 + car_height * 0.5;
     change_position(car, car_start_postionx, car_start_postiony, car_start_postionz);
 
 
@@ -146,7 +146,12 @@ function init(){
     car.add(tyre_front_right);
     car.add(tyre_back_left);
     car.add(tyre_back_right);
+    // The reference frame of tyres is not the original point but the car.
     // change_position(tyre_front_left, car_start_postionx + car_length * (0.5 - 0.186), car_start_postiony + car_width * 0.5 - tyre_width * 0.5, 100);
+    change_position(tyre_front_left, car_length * (0.5 - 0.186), car_width * 0.5 - tyre_width * 0.5, -car_height * 0.5);
+    change_position(tyre_front_right, car_length * (0.5 - 0.186), -(car_width * 0.5 - tyre_width * 0.5), -car_height * 0.5);
+    change_position(tyre_back_left, - car_length * (0.5 - 0.214), car_width * 0.5 - tyre_width * 0.5, -car_height * 0.5);
+    change_position(tyre_back_right, - car_length * (0.5 - 0.214), -(car_width * 0.5 - tyre_width * 0.5), -car_height * 0.5);
 
 
     scene.add(car);
