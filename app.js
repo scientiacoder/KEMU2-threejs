@@ -1,8 +1,13 @@
 var scene, camera, renderer;
 
-var car, steering_wheel, steering_wheel_rotation;
+var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
+
+var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
+
 
 var loader = new THREE.TextureLoader();
+
+var count = 0;
 
 function create_line(line_length, line_width=50, line_height=2){
     let geometry = new THREE.BoxGeometry(line_length, line_width, line_height)
@@ -140,10 +145,10 @@ function init(){
     var tyre_material = new THREE.MeshBasicMaterial(     
         { map: loader.load('images/tyre.png') 
             } );
-    var tyre_front_left = new THREE.Mesh(tyre_geometry, tyre_material);
-    var tyre_front_right = new THREE.Mesh(tyre_geometry, tyre_material);
-    var tyre_back_left = new THREE.Mesh(tyre_geometry, tyre_material);
-    var tyre_back_right = new THREE.Mesh(tyre_geometry, tyre_material);
+    tyre_front_left = new THREE.Mesh(tyre_geometry, tyre_material);
+    tyre_front_right = new THREE.Mesh(tyre_geometry, tyre_material);
+    tyre_back_left = new THREE.Mesh(tyre_geometry, tyre_material);
+    tyre_back_right = new THREE.Mesh(tyre_geometry, tyre_material);
     car.add(tyre_front_left);
     car.add(tyre_front_right);
     car.add(tyre_back_left);
@@ -167,7 +172,7 @@ function render(){
     renderer.render(scene, camera);
 }
 
-function showkey(){
+function dealkey(){
     var key = event.keyCode;
     //  if (key == 37) alert("left");
     //  if (key == 38) alert("up");
@@ -175,17 +180,29 @@ function showkey(){
     //  if (key == 40) alert("down");
 
     if (key == 37){
-        steering_wheel.rotation.y += 15 * Math.PI / 180;
-        steering_wheel_rotation += 15;
+        if (steering_wheel_rotation > -540){
+            steering_wheel.rotation.y += 12 * Math.PI / 180;
+            steering_wheel_rotation -= 12;
+            tyre_front_left.rotation.z += 1 * Math.PI / 180;
+            tyre_front_right.rotation.z += 1 * Math.PI / 180;
+
+        }
+
         console.log("rotation:", steering_wheel_rotation);
+        console.log("tyre rotation", tyre_front_left.rotation.z);
     }
 
     if (key == 38){
         car.position.x += 5;
     }
     if (key == 39){
-        steering_wheel.rotation.y -= 15 * Math.PI / 180;
-        steering_wheel_rotation -= 15;
+        if (steering_wheel_rotation < 540){
+            steering_wheel.rotation.y -= 15 * Math.PI / 180;
+            steering_wheel_rotation += 15;
+            tyre_front_left.rotation.z -= 1 * Math.PI / 180;
+            tyre_front_right.rotation.z -= 1 * Math.PI / 180;
+        }
+
         console.log("rotation:", steering_wheel_rotation);
     }
     if (key == 40){
@@ -208,6 +225,6 @@ function threeStart() {
     var controls = new THREE.OrbitControls(camera);
     controls.addEventListener('change', render);
 
-    document.onkeydown=showkey;
+    document.onkeydown=dealkey;
     animate();
 }
