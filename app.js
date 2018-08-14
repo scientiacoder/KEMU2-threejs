@@ -1,6 +1,8 @@
 var scene, camera, renderer;
 
-var car, steering_wheel;
+var car, steering_wheel, steering_wheel_rotation;
+
+var loader = new THREE.TextureLoader();
 
 function create_line(line_length, line_width=50, line_height=2){
     let geometry = new THREE.BoxGeometry(line_length, line_width, line_height)
@@ -123,7 +125,7 @@ function init(){
     var steering_wheel_geometry = new THREE.CylinderGeometry( 145, 145, 30, 20);
     // var steering_wheel_material = new THREE.MeshBasicMaterial( { color: 0x87ceff } );
     var steering_wheel_material = new THREE.MeshBasicMaterial(     
-                    { map: THREE.ImageUtils.loadTexture('images/steering_wheel.png') 
+                    { map: loader.load('images/steering_wheel.png') 
                         } );
 
     steering_wheel = new THREE.Mesh( steering_wheel_geometry, steering_wheel_material );
@@ -136,7 +138,7 @@ function init(){
     var tyre_radius = 30.03, tyre_width = 17.5, tyre_diameter = 2 * tyre_radius;
     var tyre_geometry = new THREE.CylinderGeometry(tyre_radius, tyre_radius, tyre_width, 20);
     var tyre_material = new THREE.MeshBasicMaterial(     
-        { map: THREE.ImageUtils.loadTexture('images/tyre.png') 
+        { map: loader.load('images/tyre.png') 
             } );
     var tyre_front_left = new THREE.Mesh(tyre_geometry, tyre_material);
     var tyre_front_right = new THREE.Mesh(tyre_geometry, tyre_material);
@@ -173,14 +175,18 @@ function showkey(){
     //  if (key == 40) alert("down");
 
     if (key == 37){
-        steering_wheel.rotation.y += 15 * Math.PI / 180
+        steering_wheel.rotation.y += 15 * Math.PI / 180;
+        steering_wheel_rotation += 15;
+        console.log("rotation:", steering_wheel_rotation);
     }
 
     if (key == 38){
         car.position.x += 5;
     }
     if (key == 39){
-        steering_wheel.rotation.y -= 15 * Math.PI / 180
+        steering_wheel.rotation.y -= 15 * Math.PI / 180;
+        steering_wheel_rotation -= 15;
+        console.log("rotation:", steering_wheel_rotation);
     }
     if (key == 40){
         car.position.x -= 5;
