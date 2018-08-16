@@ -173,7 +173,13 @@ function init(){
     console.log("tyre vertical distance: " + tyre_vertical_distance);
     var rotation_radius = tyre_vertical_distance / Math.sin(45 * Math.PI / 180);
     console.log('rotation radius: ' + rotation_radius);
-
+    car.geometry.computeBoundingBox();
+    console.log("car geometry:", car.geometry);
+    console.log("car geometry bou:", car.geometry.boundingSphere);
+    car.geometry.boundingSphere.center.x = - car_length * (0.5 - 0.214)
+    car.geometry.boundingSphere.center.y = car_width * 0.5 - tyre_width * 0.5
+    car.geometry.boundingSphere.center.z = 0
+    console.log("car geometry:", car.geometry);
     camera.position.z = 1000;
 
 }

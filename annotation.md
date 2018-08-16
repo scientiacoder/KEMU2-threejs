@@ -1,0 +1,1 @@
+change handleKeyDown function to disable camera movement when push key down.
