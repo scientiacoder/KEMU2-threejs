@@ -204,7 +204,7 @@ function dealkey(){
     }
 
     if (key == 38){
-        car.position.x += 5;
+        speed += 5;
     }
     if (key == 39){
         if (steering_wheel_rotation < 540){
@@ -218,7 +218,7 @@ function dealkey(){
         console.log("rotation:", steering_wheel_rotation);
     }
     if (key == 40){
-        car.position.x -= 5;
+        speed -= 5;
     }
 
 
@@ -226,6 +226,16 @@ function dealkey(){
  }
 
 function animate(){
+    if (speed != 0 && rotation_radius == 0){
+        if (speed > 0){
+            car.position.x += speed;
+        }else if(speed < 0){
+            car.position.x -= speed;
+        }
+    }else if(speed != 0 && rotation_radius != 0){
+
+    }
+
     render();
     requestAnimationFrame(animate);
 }
