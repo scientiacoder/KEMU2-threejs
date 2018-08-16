@@ -4,6 +4,11 @@ var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
 
 var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
 
+var speed = 0;
+
+var tyre_vertical_distance = 0;
+
+var rotation_radius = 0;
 
 var loader = new THREE.TextureLoader();
 
@@ -164,6 +169,11 @@ function init(){
     scene.add(car);
     console_log_position("car",car);
 
+    tyre_vertical_distance = Math.abs(tyre_front_left.position.x - tyre_back_left.position.x).toFixed(2);
+    console.log("tyre vertical distance: " + tyre_vertical_distance);
+    var rotation_radius = tyre_vertical_distance / Math.sin(45 * Math.PI / 180);
+    console.log('rotation radius: ' + rotation_radius);
+
     camera.position.z = 1000;
 
 }
@@ -185,11 +195,12 @@ function dealkey(){
             steering_wheel_rotation -= 12;
             tyre_front_left.rotation.z += 1 * Math.PI / 180;
             tyre_front_right.rotation.z += 1 * Math.PI / 180;
-
+            rotation_radius = tyre_vertical_distance / Math.sin(tyre_front_left.rotation.z);
         }
 
         console.log("rotation:", steering_wheel_rotation);
         console.log("tyre rotation", tyre_front_left.rotation.z);
+        console.log("rotation radius: " + rotation_radius);
     }
 
     if (key == 38){
@@ -197,12 +208,13 @@ function dealkey(){
     }
     if (key == 39){
         if (steering_wheel_rotation < 540){
-            steering_wheel.rotation.y -= 15 * Math.PI / 180;
-            steering_wheel_rotation += 15;
+            steering_wheel.rotation.y -= 12 * Math.PI / 180;
+            steering_wheel_rotation += 12;
             tyre_front_left.rotation.z -= 1 * Math.PI / 180;
             tyre_front_right.rotation.z -= 1 * Math.PI / 180;
+            rotation_radius = tyre_vertical_distance / Math.sin(tyre_front_left.rotation.z);
         }
-
+        console.log("rotation radius: " + rotation_radius);
         console.log("rotation:", steering_wheel_rotation);
     }
     if (key == 40){
