@@ -2,6 +2,8 @@ var scene, camera, renderer;
 
 var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
 
+var tyre_center;
+
 var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
 
 var speed = 0;
@@ -165,21 +167,21 @@ function init(){
     change_position(tyre_back_left, - car_length * (0.5 - 0.214), car_width * 0.5 - tyre_width * 0.5, -car_height * 0.5);
     change_position(tyre_back_right, - car_length * (0.5 - 0.214), -(car_width * 0.5 - tyre_width * 0.5), -car_height * 0.5);
 
+    tyre_center = new THREE.Object3D();
+    tyre_center.position.set(car_start_postionx, car_start_postiony, car_start_postionz);
+    tyre_center.add(car);
 
-    scene.add(car);
+    change_position(car, car_length * (0.5 - 0.214), 0 , 0)
+    // car.position.set(car_length * (0.5 - 0.214), 0 , 0);
+    scene.add(tyre_center);
+    // scene.add(car);
     console_log_position("car",car);
 
     tyre_vertical_distance = Math.abs(tyre_front_left.position.x - tyre_back_left.position.x).toFixed(2);
     console.log("tyre vertical distance: " + tyre_vertical_distance);
     var rotation_radius = tyre_vertical_distance / Math.sin(45 * Math.PI / 180);
     console.log('rotation radius: ' + rotation_radius);
-    car.geometry.computeBoundingBox();
-    console.log("car geometry:", car.geometry);
-    console.log("car geometry bou:", car.geometry.boundingSphere);
-    car.geometry.boundingSphere.center.x = - car_length * (0.5 - 0.214)
-    car.geometry.boundingSphere.center.y = car_width * 0.5 - tyre_width * 0.5
-    car.geometry.boundingSphere.center.z = 0
-    console.log("car geometry:", car.geometry);
+    
     camera.position.z = 1000;
 
 }
@@ -207,6 +209,8 @@ function dealkey(){
         console.log("rotation:", steering_wheel_rotation);
         console.log("tyre rotation", tyre_front_left.rotation.z);
         console.log("rotation radius: " + rotation_radius);
+        console.log("car position: ", car.position);
+        console.log("tyre center position: ", tyre_center.position);
     }
 
     if (key == 38){
@@ -234,9 +238,9 @@ function dealkey(){
 function animate(){
     if (speed != 0 && rotation_radius == 0){
         if (speed > 0){
-            car.position.x += speed;
+            tyre_center.position.x += speed;
         }else if(speed < 0){
-            car.position.x -= speed;
+            tyre_center.position.x -= speed;
         }
     }else if(speed != 0 && rotation_radius != 0){
 
