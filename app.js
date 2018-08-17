@@ -234,7 +234,7 @@ function dealkey(){
                 rotationy = res["y"];
                 rotationz = res["z"];
                 rotation_circum = Math.PI * rotation_radius * rotation_radius;
-                rotation_angle = (100000 * speed / rotation_circum) * Math.PI / 180;
+                rotation_angle = (10000000 * speed / rotation_circum) * Math.PI / 180;
                 console.log("rotation angle:", rotation_angle);
 
             }else{
@@ -272,7 +272,7 @@ function dealkey(){
                 rotationy = res["y"];
                 rotationz = res["z"];
                 rotation_circum = Math.PI * rotation_radius * rotation_radius;
-                rotation_angle = (100000 * speed / rotation_circum) * Math.PI / 180;
+                rotation_angle = (10000000 * speed / rotation_circum) * Math.PI / 180;
                 console.log("rotation angle:", rotation_angle);
             }else{
                 rotation_radius = 0;
@@ -300,8 +300,8 @@ function animate(){
         }else if(speed < 0){
             speedX = speed * Math.cos(tyre_center_rotation);
             speedY = speed * Math.sin(tyre_center_rotation);
-            tyre_center.position.x -= speedX;
-            tyre_center.position.y -= speedY;
+            tyre_center.position.x += speedX;
+            tyre_center.position.y += speedY;
         }
     }else if(speed != 0 && rotation_radius != 0){
         tyre_center.rotation.z += rotation_angle;
