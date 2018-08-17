@@ -304,8 +304,17 @@ function animate(){
             tyre_center.position.y += speedY;
         }
     }else if(speed != 0 && rotation_radius != 0){
-        tyre_center.rotation.z += rotation_angle;
-        tyre_center_rotation += rotation_angle
+        if (steering_wheel_rotation < 0){
+            tyre_center.rotation.z += rotation_angle;
+            tyre_center_rotation += rotation_angle;
+        }else if(steering_wheel_rotation > 0){
+            tyre_center.rotation.z -= rotation_angle;
+            tyre_center_rotation -= rotation_angle;
+        }
+        
+        // if (tyre_center_rotation >= Math.PI || tyre_center_rotation <= -Math.PI ){
+        //     tyre_center_rotation = 0;
+        // }
     }
 
     render();
