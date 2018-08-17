@@ -2,7 +2,11 @@ var scene, camera, renderer;
 
 var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
 
-var tyre_center, rotation_center;
+var tyre_center, rotation_center, tyre_center_rotation = 0;
+
+var rotationx, rotationy , rotationz, rotation_circum, rotation_angle;
+
+var center_tyre_distance;
 
 var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
 
@@ -46,7 +50,20 @@ function string_to_name(string){
     let _name = 'var new_name=' + string;
     eval(_name);
     return _name;
-} 
+}
+
+function get_rotation_center(positionx, positiony, positionz, rotation_radius, present_rotation_angle){
+    let z = positionz;
+    let x = positionx - rotation_radius * Math.sin(present_rotation_angle);
+    let y = positiony - rotation_radius * Math.cos(present_rotation_angle);
+    let res = {
+        "x":x,
+        "y":y,
+        "z":z
+    }
+    console.log("res:", res);
+    return res;
+}
 
 function console_log_position(obj_string, obj){
     
@@ -179,8 +196,10 @@ function init(){
 
     tyre_vertical_distance = Math.abs(tyre_front_left.position.x - tyre_back_left.position.x).toFixed(2);
     console.log("tyre vertical distance: " + tyre_vertical_distance);
-    var rotation_radius = tyre_vertical_distance / Math.sin(45 * Math.PI / 180);
-    console.log('rotation radius: ' + rotation_radius);
+
+    center_tyre_distance = car_width * 0.5 - tyre_width * 0.5;
+ 
+
     
     camera.position.z = 1000;
 
@@ -205,16 +224,30 @@ function dealkey(){
             tyre_front_right.rotation.z += 1 * Math.PI / 180;
             if (steering_wheel_rotation != 0){
                 rotation_radius = tyre_vertical_distance / Math.sin(tyre_front_left.rotation.z);
+                rotation_radius -= center_tyre_distance;
+                res = get_rotation_center(tyre_center.position.x, tyre_center.position.y,
+                                                                        tyre_center.position.z, rotation_radius, 
+                                                                        tyre_center_rotation);
+                rotationx = res["x"];
+                rotationy = res["y"];
+                rotationz = res["z"];
+                rotation_circum = Math.PI * rotation_radius * rotation_radius;
+                rotation_angle = (10000 * speed / rotation_circum) * Math.PI / 180;
+                console.log("rotation angle:", rotation_angle);
+
             }else{
                 rotation_radius = 0;
             }
         }
 
         console.log("rotation:", steering_wheel_rotation);
+        console.log("car rotation", car.rotation.z);
         console.log("tyre rotation", tyre_front_left.rotation.z);
         console.log("rotation radius: " + rotation_radius);
         console.log("car position: ", car.position);
         console.log("tyre center position: ", tyre_center.position);
+        console.log("tyre back left:", tyre_back_left);
+        console.log("tyre back right:", tyre_back_right.position);
     }
 
     if (key == 38){
@@ -251,7 +284,7 @@ function animate(){
             tyre_center.position.x -= speed;
         }
     }else if(speed != 0 && rotation_radius != 0){
-
+        tyre_center.rotation.z += rotation_angle;
     }
 
     render();
