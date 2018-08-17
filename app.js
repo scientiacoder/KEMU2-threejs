@@ -12,6 +12,8 @@ var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
 
 var speed = 0;
 
+var speedX, speedY;
+
 var tyre_vertical_distance = 0;
 
 var rotation_radius = 0;
@@ -232,7 +234,7 @@ function dealkey(){
                 rotationy = res["y"];
                 rotationz = res["z"];
                 rotation_circum = Math.PI * rotation_radius * rotation_radius;
-                rotation_angle = (10000 * speed / rotation_circum) * Math.PI / 180;
+                rotation_angle = (100000 * speed / rotation_circum) * Math.PI / 180;
                 console.log("rotation angle:", rotation_angle);
 
             }else{
@@ -252,6 +254,7 @@ function dealkey(){
 
     if (key == 38){
         speed += 5;
+        console.log("tyre center rotation:", tyre_center_rotation);
     }
     if (key == 39){
         if (steering_wheel_rotation < 540){
@@ -261,6 +264,16 @@ function dealkey(){
             tyre_front_right.rotation.z -= 1 * Math.PI / 180;
             if (steering_wheel_rotation != 0){
                 rotation_radius = tyre_vertical_distance / Math.sin(tyre_front_left.rotation.z);
+                rotation_radius -= center_tyre_distance;
+                res = get_rotation_center(tyre_center.position.x, tyre_center.position.y,
+                                                                        tyre_center.position.z, rotation_radius, 
+                                                                        tyre_center_rotation);
+                rotationx = res["x"];
+                rotationy = res["y"];
+                rotationz = res["z"];
+                rotation_circum = Math.PI * rotation_radius * rotation_radius;
+                rotation_angle = (100000 * speed / rotation_circum) * Math.PI / 180;
+                console.log("rotation angle:", rotation_angle);
             }else{
                 rotation_radius = 0;
             }
@@ -279,12 +292,20 @@ function dealkey(){
 function animate(){
     if (speed != 0 && rotation_radius == 0){
         if (speed > 0){
-            tyre_center.position.x += speed;
+            speedX = speed * Math.cos(tyre_center_rotation);
+            speedY = speed * Math.sin(tyre_center_rotation);
+            tyre_center.position.x += speedX;
+            tyre_center.position.y += speedY;
+            
         }else if(speed < 0){
-            tyre_center.position.x -= speed;
+            speedX = speed * Math.cos(tyre_center_rotation);
+            speedY = speed * Math.sin(tyre_center_rotation);
+            tyre_center.position.x -= speedX;
+            tyre_center.position.y -= speedY;
         }
     }else if(speed != 0 && rotation_radius != 0){
         tyre_center.rotation.z += rotation_angle;
+        tyre_center_rotation += rotation_angle
     }
 
     render();
