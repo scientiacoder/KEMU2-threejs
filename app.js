@@ -2,6 +2,8 @@ var scene, camera, renderer;
 
 var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
 
+var car_length = 450.1, car_width = 170.6, car_height = 146.9 - 30.03 * 2;
+
 var tyre_center, rotation_center, tyre_center_rotation = 0;
 
 var rotationx, rotationy , rotationz, rotation_circum, rotation_angle;
@@ -85,8 +87,6 @@ function init(){
 
     document.getElementById("canvas-frame").appendChild( renderer.domElement );
 
-
-    var car_length = 450.1, car_width = 170.6, car_height = 146.9 - 30.03 * 2;
     var garage_width = car_width + 60, garage_length = car_length + 70;
     var control_distance = car_length * 1.5, lane_width = car_length * 1.5;
 
@@ -218,7 +218,7 @@ var collision_mesh_list = [top_line, middle_line_left, left_vertical_middle_line
 var detect_mesh_list = [car];
 
 function get_car_position(){
-    car_position = {};
+    var car_position = {};
     // change_position(car, car_length * (0.5 - 0.214), 0 , 0)
     car_position.x = tyre_center.position.x + car_length * (0.5 - 0.214);
     car_position.y = tyre_center.position.y;
@@ -226,18 +226,33 @@ function get_car_position(){
     return car_position;
 }
 
+function get_car_matrix(){
+    var car_matrix;
+    car_matrix = tyre_center.matrix.clone();
+    car_matrix["elements"][14] = tyre_center.position.z;
+    car_matrix["elements"][13] = tyre_center.position.y;
+    car_matrix["elements"][12] = tyre_center.position.x + car_length * (0.5 - 0.214);
+    
+    return car_matrix;
+}
+
 
 function collision_detection(){
 
-    var origin_point = car.position.clone();
+    var  origin_car_position = get_car_position;
     for (var vertex_index = 0; vertex_index < car.geometry.vertices.length; vertex_index ++){
         var local_vertex = car.geometry.vertices[vertex_index].clone();
 
+        console.log("tyre center matrix: ",tyre_center.matrix);
+        console.log("car matrix: ",get_car_matrix());
+        
         var global_vertex = local_vertex.applyMatrix4(car.matrix);
+        
         console.log("global vertex: ", global_vertex);
         var direction_vector = global_vertex.sub(car.position);
         console.log("car position: ", car.position);
         console.log("direction vector: ", direction_vector);
+        var ray = new THREE.Raycaster(origin_car_position, direction_vector.clone().normalize());
     }
 }
 
@@ -355,7 +370,7 @@ function animate(){
         //     tyre_center_rotation = 0;
         // }
     }
-
+    // collision_detection();
     render();
     requestAnimationFrame(animate);
 }
