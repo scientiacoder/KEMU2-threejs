@@ -14,11 +14,25 @@ var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
 
 var speed = 0;
 
+var crash = false;
+
 var speedX, speedY;
 
 var tyre_vertical_distance = 0;
 
 var rotation_radius = 0;
+
+
+/****** 
+DEFINE LINES IN THE SCENE
+var collision_mesh_list = [top_line, middle_line_left, left_vertical_middle_line, right_vertical_middle_line,
+                            bottom_line, middle_line_right];
+*******/
+var top_line, middle_line_left, middle_line_right, left_vertical_middle_line, right_vertical_middle_line, bottom_line;
+
+var collision_mesh_list;
+
+// var detect_mesh_list = [car];
 
 var loader = new THREE.TextureLoader();
 
@@ -109,19 +123,19 @@ function init(){
 
     var line_width = 50, line_height = 2;
     var topline_length = road_length;
-    var top_line = create_line_with_position(topline_length, line_width, line_height, 0, 2 * 0.5 * line_width + lane_width, 100);
+    top_line = create_line_with_position(topline_length, line_width, line_height, 0, 2 * 0.5 * line_width + lane_width, 100);
 
     console_log_position("top_line", top_line);
     scene.add(top_line);
 
     var middle_line_left_length = (topline_length - garage_width) / 2
-    var middle_line_left = create_line_with_position(middle_line_left_length, line_width, line_height,
+    middle_line_left = create_line_with_position(middle_line_left_length, line_width, line_height,
                                                     -(garage_width + middle_line_left_length) * 0.5, 0, 100);
     scene.add(middle_line_left);
     console.log("middleline left position:" + middle_line_left.position)
     console_log_position("middle_line_left" ,middle_line_left);  
 
-    var left_vertical_middle_line = create_line(garage_length, line_width, line_height);
+    left_vertical_middle_line = create_line(garage_length, line_width, line_height);
     left_vertical_middle_line.rotation.z = 90 * Math.PI / 180;
     change_position(left_vertical_middle_line, - (garage_width * 0.5 + 25), - (garage_length * 0.5), 100);
 
@@ -129,19 +143,19 @@ function init(){
     console_log_position("left_vertical_middle_line", left_vertical_middle_line);
     scene.add(left_vertical_middle_line);
 
-    var right_vertical_middle_line = create_line(garage_length, line_width, line_height);
+    right_vertical_middle_line = create_line(garage_length, line_width, line_height);
     right_vertical_middle_line.rotation.z = 90 * Math.PI / 180;
     change_position(right_vertical_middle_line, garage_width * 0.5 + 25, - (garage_length * 0.5), 100);
     console_log_position("right_vertical_middle_line", right_vertical_middle_line);
     scene.add(right_vertical_middle_line);
 
-    var bottom_line = create_line(garage_width, line_width, line_height);
+    bottom_line = create_line(garage_width, line_width, line_height);
     change_position(bottom_line, 0, -(garage_length + 25), 100);
     console_log_position("bottom_line",bottom_line);
     scene.add(bottom_line);
 
     var middle_line_right_length = middle_line_left_length;
-    var middle_line_right = create_line_with_position(middle_line_right_length, line_width, line_height,
+    middle_line_right = create_line_with_position(middle_line_right_length, line_width, line_height,
                                                         (garage_width + middle_line_right_length) * 0.5, 
                                                         0, 100);
     scene.add(middle_line_right);
@@ -206,16 +220,12 @@ function init(){
     console.log("car matrix: ", car.matrix);
  
 
-    
+    collision_mesh_list = [top_line, middle_line_left, left_vertical_middle_line, right_vertical_middle_line,
+        bottom_line, middle_line_right];
     camera.position.z = 1000;
 
 }
 
-
-var collision_mesh_list = [top_line, middle_line_left, left_vertical_middle_line, right_vertical_middle_line,
-                            bottom_line, middle_line_right];
-
-var detect_mesh_list = [car];
 
 function get_car_position(){
     var car_position = {};
@@ -239,20 +249,27 @@ function get_car_matrix(){
 
 function collision_detection(){
 
-    var  origin_car_position = get_car_position;
+    var  origin_car_position = get_car_position();
     for (var vertex_index = 0; vertex_index < car.geometry.vertices.length; vertex_index ++){
         var local_vertex = car.geometry.vertices[vertex_index].clone();
 
+        console.log("local vertex: ", local_vertex);
         console.log("tyre center matrix: ",tyre_center.matrix);
         console.log("car matrix: ",get_car_matrix());
         
-        var global_vertex = local_vertex.applyMatrix4(car.matrix);
+        var global_vertex = local_vertex.applyMatrix4(get_car_matrix());
         
         console.log("global vertex: ", global_vertex);
-        var direction_vector = global_vertex.sub(car.position);
-        console.log("car position: ", car.position);
+        var direction_vector = global_vertex.sub(get_car_position());
+        console.log("car position: ",get_car_position());
         console.log("direction vector: ", direction_vector);
         var ray = new THREE.Raycaster(origin_car_position, direction_vector.clone().normalize());
+        console.log("ray: ",ray);
+        console.log("mesh list: ", collision_mesh_list);
+        var collision_results = ray.intersectObjects(collision_mesh_list, true);
+        if (collision_results.length > 0 && collision_results[0].distance < direction_vector.length()){
+            crash = true;
+        } 
     }
 }
 
@@ -383,6 +400,9 @@ function threeStart() {
     controls.addEventListener('change', render);
 
     document.onkeydown=dealkey;
+    setTimeout(() => {
+        
+    }, 2000);
     collision_detection();
     animate();
 }
