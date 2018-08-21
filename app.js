@@ -200,12 +200,51 @@ function init(){
     console.log("tyre vertical distance: " + tyre_vertical_distance);
 
     center_tyre_distance = car_width * 0.5 - tyre_width * 0.5;
+
+    console.log("tyre vertices: ", tyre_back_left.geometry.vertices);
+    console.log("car vertices: " , car.geometry.vertices);
+    console.log("car matrix: ", car.matrix);
  
 
     
     camera.position.z = 1000;
 
 }
+
+
+var collision_mesh_list = [top_line, middle_line_left, left_vertical_middle_line, right_vertical_middle_line,
+                            bottom_line, middle_line_right];
+
+var detect_mesh_list = [car];
+
+function get_car_position(){
+    car_position = {};
+    // change_position(car, car_length * (0.5 - 0.214), 0 , 0)
+    car_position.x = tyre_center.position.x + car_length * (0.5 - 0.214);
+    car_position.y = tyre_center.position.y;
+    car_position.z = tyre_center.position.z;
+    return car_position;
+}
+
+
+function collision_detection(){
+
+    var origin_point = car.position.clone();
+    for (var vertex_index = 0; vertex_index < car.geometry.vertices.length; vertex_index ++){
+        var local_vertex = car.geometry.vertices[vertex_index].clone();
+
+        var global_vertex = local_vertex.applyMatrix4(car.matrix);
+        console.log("global vertex: ", global_vertex);
+        var direction_vector = global_vertex.sub(car.position);
+        console.log("car position: ", car.position);
+        console.log("direction vector: ", direction_vector);
+    }
+}
+
+
+
+
+
 
 function render(){
     renderer.render(scene, camera);
@@ -329,5 +368,6 @@ function threeStart() {
     controls.addEventListener('change', render);
 
     document.onkeydown=dealkey;
+    collision_detection();
     animate();
 }
