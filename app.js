@@ -3,8 +3,9 @@ var scene, camera, renderer;
 var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
 
 var car_length = 450.1, car_width = 170.6, car_height = 146.9 - 30.03 * 2;
+// var car_length = 450.1, car_width = 170.6, car_height = 20;
 
-var tyre_center, rotation_center, tyre_center_rotation = 0;
+var car, rotation_center, car_rotation = 0;
 
 var rotationx, rotationy , rotationz, rotation_circum, rotation_angle;
 
@@ -163,7 +164,7 @@ function init(){
     
     car = create_car(car_length, car_width, car_height);
 
-    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz = 100 + 30.03 + car_height * 0.5;
+    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz = 100 + 30.03 + car_height * 0.5 - 100;
     change_position(car, car_start_postionx, car_start_postiony, car_start_postionz);
 
 
@@ -200,14 +201,14 @@ function init(){
     change_position(tyre_back_left, - car_length * (0.5 - 0.214), car_width * 0.5 - tyre_width * 0.5, -car_height * 0.5);
     change_position(tyre_back_right, - car_length * (0.5 - 0.214), -(car_width * 0.5 - tyre_width * 0.5), -car_height * 0.5);
 
-    tyre_center = new THREE.Object3D();
-    tyre_center.position.set(car_start_postionx, car_start_postiony, car_start_postionz);
-    tyre_center.add(car);
+    // car = new THREE.Object3D();
+    // car.position.set(car_start_postionx, car_start_postiony, car_start_postionz);
+    // car.add(car);
 
-    change_position(car, car_length * (0.5 - 0.214), 0 , 0)
+    // change_position(car, car_length * (0.5 - 0.214), 0 , 0)
     // car.position.set(car_length * (0.5 - 0.214), 0 , 0);
-    scene.add(tyre_center);
     // scene.add(car);
+    scene.add(car);
     console_log_position("car",car);
 
     tyre_vertical_distance = Math.abs(tyre_front_left.position.x - tyre_back_left.position.x).toFixed(2);
@@ -228,20 +229,22 @@ function init(){
 
 
 function get_car_position(){
-    var car_position = {};
+    var car_position;
+    car_position = car.position.clone();
+    console.log("car position is :", car_position.origin, "....", car.position);
     // change_position(car, car_length * (0.5 - 0.214), 0 , 0)
-    car_position.x = tyre_center.position.x + car_length * (0.5 - 0.214);
-    car_position.y = tyre_center.position.y;
-    car_position.z = tyre_center.position.z;
+    car_position.x = car.position.x + car_length * (0.5 - 0.214);
+    car_position.y = car.position.y;
+    car_position.z = car.position.z;
     return car_position;
 }
 
 function get_car_matrix(){
     var car_matrix;
-    car_matrix = tyre_center.matrix.clone();
-    car_matrix["elements"][14] = tyre_center.position.z;
-    car_matrix["elements"][13] = tyre_center.position.y;
-    car_matrix["elements"][12] = tyre_center.position.x + car_length * (0.5 - 0.214);
+    car_matrix = car.matrix.clone();
+    car_matrix["elements"][14] = car.position.z;
+    car_matrix["elements"][13] = car.position.y;
+    car_matrix["elements"][12] = car.position.x + car_length * (0.5 - 0.214);
     
     return car_matrix;
 }
@@ -254,7 +257,7 @@ function collision_detection(){
         var local_vertex = car.geometry.vertices[vertex_index].clone();
 
         console.log("local vertex: ", local_vertex);
-        console.log("tyre center matrix: ",tyre_center.matrix);
+        console.log("tyre center matrix: ",car.matrix);
         console.log("car matrix: ",get_car_matrix());
         
         var global_vertex = local_vertex.applyMatrix4(get_car_matrix());
@@ -266,13 +269,44 @@ function collision_detection(){
         var ray = new THREE.Raycaster(origin_car_position, direction_vector.clone().normalize());
         console.log("ray: ",ray);
         console.log("mesh list: ", collision_mesh_list);
+
+
+        // console.log("distance to squard: ",car.position)
+        // var c_r = ray.intersectObjects( top_line );
         var collision_results = ray.intersectObjects(collision_mesh_list, true);
+        // console.log("collision results:", collision_results);
         if (collision_results.length > 0 && collision_results[0].distance < direction_vector.length()){
             crash = true;
+            alert("GG");
         } 
+
+
     }
 }
 
+function collision_detection2(){
+    var  origin_car_position = car.position.clone();
+    for (var vertex_index = 0; vertex_index < car.geometry.vertices.length; vertex_index ++){
+        var local_vertex = car.geometry.vertices[vertex_index].clone();
+        
+        var global_vertex = local_vertex.applyMatrix4(car.matrix);
+        
+        var direction_vector = global_vertex.sub(car.position);
+
+        var ray = new THREE.Raycaster(origin_car_position, direction_vector.clone().normalize());
+
+        collision_mesh_list = [top_line];
+        // console.log("distance to squard: ",car.position)
+        // var c_r = ray.intersectObjects( top_line );
+        var collision_results = ray.intersectObjects(collision_mesh_list, true);
+        // console.log("collision results:", collision_results);
+        if (collision_results.length > 0 && collision_results[0].distance < direction_vector.length()){
+            crash = true;
+            console.log("GG");
+            alert("GG");
+        } 
+    }
+}
 
 
 
@@ -298,9 +332,9 @@ function dealkey(){
             if (steering_wheel_rotation != 0){
                 rotation_radius = tyre_vertical_distance / Math.sin(tyre_front_left.rotation.z);
                 rotation_radius -= center_tyre_distance;
-                res = get_rotation_center(tyre_center.position.x, tyre_center.position.y,
-                                                                        tyre_center.position.z, rotation_radius, 
-                                                                        tyre_center_rotation);
+                res = get_rotation_center(car.position.x, car.position.y,
+                                                                        car.position.z, rotation_radius, 
+                                                                        car_rotation);
                 rotationx = res["x"];
                 rotationy = res["y"];
                 rotationz = res["z"];
@@ -318,14 +352,13 @@ function dealkey(){
         console.log("tyre rotation", tyre_front_left.rotation.z);
         console.log("rotation radius: " + rotation_radius);
         console.log("car position: ", car.position);
-        console.log("tyre center position: ", tyre_center.position);
         console.log("tyre back left:", tyre_back_left);
         console.log("tyre back right:", tyre_back_right.position);
     }
 
     if (key == 38){
         speed += 5;
-        console.log("tyre center rotation:", tyre_center_rotation);
+        console.log("tyre center rotation:", car_rotation);
     }
     if (key == 39){
         if (steering_wheel_rotation < 540){
@@ -336,9 +369,9 @@ function dealkey(){
             if (steering_wheel_rotation != 0){
                 rotation_radius = tyre_vertical_distance / Math.sin(tyre_front_left.rotation.z);
                 rotation_radius -= center_tyre_distance;
-                res = get_rotation_center(tyre_center.position.x, tyre_center.position.y,
-                                                                        tyre_center.position.z, rotation_radius, 
-                                                                        tyre_center_rotation);
+                res = get_rotation_center(car.position.x, car.position.y,
+                                                                        car.position.z, rotation_radius, 
+                                                                        car_rotation);
                 rotationx = res["x"];
                 rotationy = res["y"];
                 rotationz = res["z"];
@@ -363,36 +396,39 @@ function dealkey(){
 function animate(){
     if (speed != 0 && rotation_radius == 0){
         if (speed > 0){
-            speedX = speed * Math.cos(tyre_center_rotation);
-            speedY = speed * Math.sin(tyre_center_rotation);
-            tyre_center.position.x += speedX;
-            tyre_center.position.y += speedY;
+            speedX = speed * Math.cos(car_rotation);
+            speedY = speed * Math.sin(car_rotation);
+            car.position.x += speedX;
+            car.position.y += speedY;
+
+            car.position.x += speedX;
+            car.position.y += speedY;
             
         }else if(speed < 0){
-            speedX = speed * Math.cos(tyre_center_rotation);
-            speedY = speed * Math.sin(tyre_center_rotation);
-            tyre_center.position.x += speedX;
-            tyre_center.position.y += speedY;
+            speedX = speed * Math.cos(car_rotation);
+            speedY = speed * Math.sin(car_rotation);
+            car.position.x += speedX;
+            car.position.y += speedY;
         }
     }else if(speed != 0 && rotation_radius != 0){
         if (steering_wheel_rotation < 0){
-            tyre_center.rotation.z += rotation_angle;
-            tyre_center_rotation += rotation_angle;
+            car.rotation.z += rotation_angle;
+            car_rotation += rotation_angle;
         }else if(steering_wheel_rotation > 0){
-            tyre_center.rotation.z -= rotation_angle;
-            tyre_center_rotation -= rotation_angle;
+            car.rotation.z -= rotation_angle;
+            car_rotation -= rotation_angle;
         }
         
-        // if (tyre_center_rotation >= Math.PI || tyre_center_rotation <= -Math.PI ){
-        //     tyre_center_rotation = 0;
+        // if (car_rotation >= Math.PI || car_rotation <= -Math.PI ){
+        //     car_rotation = 0;
         // }
     }
-    // collision_detection();
+    collision_detection2();
     render();
     requestAnimationFrame(animate);
 }
 
-function threeStart() {
+threeStart = function() {
 
     init();
 
@@ -400,9 +436,9 @@ function threeStart() {
     controls.addEventListener('change', render);
 
     document.onkeydown=dealkey;
-    setTimeout(() => {
-        
-    }, 2000);
-    collision_detection();
+
+    collision_detection2();
     animate();
 }
+
+// threeStart();
