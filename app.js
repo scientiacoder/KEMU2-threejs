@@ -164,7 +164,8 @@ function init(){
     
     car = create_car(car_length, car_width, car_height);
 
-    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz = 100 + 30.03 + car_height * 0.5 - 100;
+    var car_start_postionx = -700, car_start_postiony = 500, car_start_postionz =  30.03 + car_height * 0.5;
+    // 100 +
     change_position(car, car_start_postionx, car_start_postiony, car_start_postionz);
 
 
@@ -251,40 +252,6 @@ function get_car_matrix(){
 
 
 function collision_detection(){
-
-    var  origin_car_position = get_car_position();
-    for (var vertex_index = 0; vertex_index < car.geometry.vertices.length; vertex_index ++){
-        var local_vertex = car.geometry.vertices[vertex_index].clone();
-
-        console.log("local vertex: ", local_vertex);
-        console.log("tyre center matrix: ",car.matrix);
-        console.log("car matrix: ",get_car_matrix());
-        
-        var global_vertex = local_vertex.applyMatrix4(get_car_matrix());
-        
-        console.log("global vertex: ", global_vertex);
-        var direction_vector = global_vertex.sub(get_car_position());
-        console.log("car position: ",get_car_position());
-        console.log("direction vector: ", direction_vector);
-        var ray = new THREE.Raycaster(origin_car_position, direction_vector.clone().normalize());
-        console.log("ray: ",ray);
-        console.log("mesh list: ", collision_mesh_list);
-
-
-        // console.log("distance to squard: ",car.position)
-        // var c_r = ray.intersectObjects( top_line );
-        var collision_results = ray.intersectObjects(collision_mesh_list, true);
-        // console.log("collision results:", collision_results);
-        if (collision_results.length > 0 && collision_results[0].distance < direction_vector.length()){
-            crash = true;
-            alert("GG");
-        } 
-
-
-    }
-}
-
-function collision_detection2(){
     var  origin_car_position = car.position.clone();
     for (var vertex_index = 0; vertex_index < car.geometry.vertices.length; vertex_index ++){
         var local_vertex = car.geometry.vertices[vertex_index].clone();
@@ -295,7 +262,7 @@ function collision_detection2(){
 
         var ray = new THREE.Raycaster(origin_car_position, direction_vector.clone().normalize());
 
-        collision_mesh_list = [top_line];
+        // collision_mesh_list = [top_line];
         // console.log("distance to squard: ",car.position)
         // var c_r = ray.intersectObjects( top_line );
         var collision_results = ray.intersectObjects(collision_mesh_list, true);
@@ -309,7 +276,9 @@ function collision_detection2(){
 }
 
 
-
+function check_win(){
+    
+}
 
 
 function render(){
@@ -423,7 +392,7 @@ function animate(){
         //     car_rotation = 0;
         // }
     }
-    collision_detection2();
+    collision_detection();
     render();
     requestAnimationFrame(animate);
 }
@@ -437,7 +406,7 @@ threeStart = function() {
 
     document.onkeydown=dealkey;
 
-    collision_detection2();
+    // collision_detection();
     animate();
 }
 
