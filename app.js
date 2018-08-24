@@ -5,6 +5,8 @@ var car, steering_wheel, steering_wheel_rotation = 0, tyre_rotation = 0;
 var car_length = 450.1, car_width = 170.6, car_height = 146.9 - 30.03 * 2;
 // var car_length = 450.1, car_width = 170.6, car_height = 20;
 
+var line_width = 50, line_height = 2;
+
 var car, rotation_center, car_rotation = 0;
 
 var rotationx, rotationy , rotationz, rotation_circum, rotation_angle;
@@ -16,6 +18,8 @@ var tyre_front_left, tyre_front_right, tyre_back_left, tyre_back_right;
 var speed = 0;
 
 var crash = false;
+
+var wrapper = new THREE.Object3D();; //rotation center
 
 var speedX, speedY;
 
@@ -122,7 +126,6 @@ function init(){
 
     scene.add( cube );
 
-    var line_width = 50, line_height = 2;
     var topline_length = road_length;
     top_line = create_line_with_position(topline_length, line_width, line_height, 0, 2 * 0.5 * line_width + lane_width, 100);
 
@@ -275,11 +278,40 @@ function collision_detection(){
     }
 }
 
-
-function check_win(){
-    
+function get_tyre_position(car, tyre){
+    var position = {}
+    position["x"] = car.position.x + tyre.position.x;
+    position["y"] = car.position.y + tyre.position.y;
+    position["z"] = car.position.z + tyre.position.z;
+    return position;
 }
 
+function get_position(obj){
+    var position = {};
+    position["x"] = obj.position.x;
+    position["y"] = obj.position.y;
+    position["z"] = obj.position.z;
+    return position;
+
+}
+function check_win(){
+
+    if (Math.sin(car_rotation) > 0 && car.position.x + car_width * 0.5 < right_vertical_middle_line.position.x - line_width * 0.5 &&
+                car.position.x - car_width * 0.5 > left_vertical_middle_line.position.x + line_width * 0.5 &&
+                car.position.y + car_length * 0.5 < middle_line_left.position.y + line_width * 0.5 &&
+                car.position.y - car_length * 0.5 > bottom_line.position.y + line_width * 0.5 &&
+                speed == 0){
+        alert("Winner Winner Chicken Dinner");
+    }
+}
+
+function changePivot(x,y,z,obj){
+    wrapper = new THREE.Object3D();
+    wrapper.position.set(x,y,z);
+    wrapper.add(obj);
+    obj.position.set(-x,-y,-z);
+    
+ }
 
 function render(){
     renderer.render(scene, camera);
@@ -308,7 +340,11 @@ function dealkey(){
                 rotationy = res["y"];
                 rotationz = res["z"];
                 rotation_circum = Math.PI * rotation_radius * rotation_radius;
+                // changePivot(rotationx, rotationy, rotationz, car);
+                console.log("x y z:", rotationx, rotationy, rotationz);
+                console.log("car x, y z:", car.position.x, car.position.y, car.position.z);
                 rotation_angle = (10000000 * speed / rotation_circum) * Math.PI / 180;
+                // rotation_angle = (speed / rotation_circum) * Math.PI / 180;
                 console.log("rotation angle:", rotation_angle);
 
             }else{
@@ -345,7 +381,11 @@ function dealkey(){
                 rotationy = res["y"];
                 rotationz = res["z"];
                 rotation_circum = Math.PI * rotation_radius * rotation_radius;
+                // changePivot(rotationx, rotationy, rotationz, car);
+                console.log("x y z:", rotationx, rotationy, rotationz);
+                console.log("car x, y z:", car.position.x, car.position.y, car.position.z);
                 rotation_angle = (10000000 * speed / rotation_circum) * Math.PI / 180;
+                // rotation_angle = (speed / rotation_circum) * Math.PI / 180;
                 console.log("rotation angle:", rotation_angle);
             }else{
                 rotation_radius = 0;
@@ -364,27 +404,20 @@ function dealkey(){
 
 function animate(){
     if (speed != 0 && rotation_radius == 0){
-        if (speed > 0){
-            speedX = speed * Math.cos(car_rotation);
-            speedY = speed * Math.sin(car_rotation);
-            car.position.x += speedX;
-            car.position.y += speedY;
 
-            car.position.x += speedX;
-            car.position.y += speedY;
-            
-        }else if(speed < 0){
             speedX = speed * Math.cos(car_rotation);
             speedY = speed * Math.sin(car_rotation);
             car.position.x += speedX;
             car.position.y += speedY;
-        }
+        
     }else if(speed != 0 && rotation_radius != 0){
         if (steering_wheel_rotation < 0){
             car.rotation.z += rotation_angle;
+            // wrapper.rotation.z += rotation_angle;
             car_rotation += rotation_angle;
         }else if(steering_wheel_rotation > 0){
             car.rotation.z -= rotation_angle;
+            // wrapper.rotation.z += rotation_angle;
             car_rotation -= rotation_angle;
         }
         
@@ -393,6 +426,8 @@ function animate(){
         // }
     }
     collision_detection();
+    check_win();
+    
     render();
     requestAnimationFrame(animate);
 }
@@ -406,6 +441,7 @@ threeStart = function() {
 
     document.onkeydown=dealkey;
 
+    check_win();
     // collision_detection();
     animate();
 }
