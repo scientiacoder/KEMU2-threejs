@@ -12,10 +12,10 @@
 //     }
 //   }
 
-document.addEventListener("keydown", function(event){
-    console.log(event);
-    console.log("--keydown captured--");
-});
+// document.addEventListener("keydown", function(event){
+//     console.log(event);
+//     console.log("--keydown captured--");
+// });
 
 // var canvas = document.getElementById("canvas-frame");
 // var events = document.createEvent("KeyboardEvent");
