@@ -318,7 +318,17 @@ function render(){
 }
 
 function dealkey(){
+    var event_key = event.key;
     var key = event.keyCode;
+    if (event_key == "ArrowLeft"){
+        key = 37;
+    }else if (event_key == "ArrowUp"){
+        key = 38
+    }else if(event_key == "ArrowRight"){
+        key = 39
+    }else if(event_key == "ArrowDown"){
+        key = 40;
+    }
     //  if (key == 37) alert("left");
     //  if (key == 38) alert("up");
     //  if (key == 39) alert("right");
