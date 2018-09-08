@@ -141,7 +141,7 @@ function init(){
 
     left_vertical_middle_line = create_line(garage_length, line_width, line_height);
     left_vertical_middle_line.rotation.z = 90 * Math.PI / 180;
-    change_position(left_vertical_middle_line, - (garage_width * 0.5 + 25), - (garage_length * 0.5), 100);
+    change_position(left_vertical_middle_line, - (garage_width * 0.5 + 25), - (garage_length * 0.5 - 25), 100);
 
 
     console_log_position("left_vertical_middle_line", left_vertical_middle_line);
@@ -149,12 +149,12 @@ function init(){
 
     right_vertical_middle_line = create_line(garage_length, line_width, line_height);
     right_vertical_middle_line.rotation.z = 90 * Math.PI / 180;
-    change_position(right_vertical_middle_line, garage_width * 0.5 + 25, - (garage_length * 0.5), 100);
+    change_position(right_vertical_middle_line, garage_width * 0.5 + 25, - (garage_length * 0.5 - 25), 100);
     console_log_position("right_vertical_middle_line", right_vertical_middle_line);
     scene.add(right_vertical_middle_line);
 
     bottom_line = create_line(garage_width, line_width, line_height);
-    change_position(bottom_line, 0, -(garage_length + 25), 100);
+    change_position(bottom_line, 0, -(garage_length), 100);
     console_log_position("bottom_line",bottom_line);
     scene.add(bottom_line);
 
